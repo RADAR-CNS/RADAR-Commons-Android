@@ -1,0 +1,47 @@
+version: 2
+updates:
+- package-ecosystem: gradle
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  target-branch: dev
+  ignore:
+  - dependency-name: org.apache.avro:avro
+    versions:
+    - "> 1.8.2, < 2"
+  - dependency-name: org.jetbrains.kotlin:kotlin-stdlib-jdk8
+    versions:
+    - 1.4.21-2
+    - 1.4.30
+    - 1.4.31
+    - 1.4.32
+  - dependency-name: org.jetbrains.kotlin:kotlin-gradle-plugin
+    versions:
+    - 1.4.21-2
+    - 1.4.30
+    - 1.4.31
+    - 1.4.32
+  - dependency-name: com.google.firebase:firebase-crashlytics
+    versions:
+    - 17.3.1
+    - 17.4.0
+  - dependency-name: com.google.firebase:firebase-config
+    versions:
+    - 20.0.3
+    - 20.0.4
+  - dependency-name: org.jetbrains.dokka:dokka-gradle-plugin
+    versions:
+    - 1.4.20-dev-65
+  - dependency-name: androidx.lifecycle:lifecycle-service
+    versions:
+    - 2.3.0
+  - dependency-name: com.squareup.okhttp3:okhttp
+    versions:
+    - 4.9.1
+  - dependency-name: com.google.firebase:firebase-core
+    versions:
+    - 18.0.2
+  - dependency-name: com.android.tools.build:gradle
+    versions:
+    - 4.1.2
