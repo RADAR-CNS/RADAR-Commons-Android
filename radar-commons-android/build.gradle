@@ -32,7 +32,7 @@ dependencies {
         exclude group: 'org.json', module: 'json'
         exclude group: 'org.apache.avro', module: 'avro'
     }
-    api ('org.radarbase:radar-schemas-commons:0.7.0') {
+    api ('org.radarbase:radar-schemas-commons:0.7.1') {
         exclude group: 'org.apache.avro', module: 'avro'
     }
     //noinspection GradleDependency
