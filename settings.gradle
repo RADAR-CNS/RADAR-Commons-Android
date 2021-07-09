@@ -1,5 +1,6 @@
 rootProject.name = 'radar-commons-android-root'
 include ':radar-commons-android'
+include ':avro-android'
 
 file("${rootDir}/plugins").listFiles().each { pluginDir ->
     if (!file("$pluginDir/gradle.skip").exists()) {

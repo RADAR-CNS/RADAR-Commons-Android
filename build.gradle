@@ -61,7 +61,6 @@ subprojects {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://repo.thehyve.nl/content/repositories/snapshots' }
     }
 
     dependencies {
