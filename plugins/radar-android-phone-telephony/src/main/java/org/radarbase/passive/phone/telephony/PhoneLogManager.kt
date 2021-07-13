@@ -92,14 +92,14 @@ class PhoneLogManager(context: PhoneLogService) : AbstractSourceManager<PhoneLog
 
     private fun processSmsLog() {
         val newSmsTimestamp = processDb(Telephony.Sms.CONTENT_URI, SMS_COLUMNS, Telephony.Sms.DATE, lastSmsTimestamp) {
-            val date = getLong(getColumnIndex(Telephony.Sms.DATE))
+            val date = getLong(getColumnIndexOrThrow(Telephony.Sms.DATE))
 
             // If from contact, then the ID of the sender is a non-zero integer
-            val isAContact = getInt(getColumnIndex(Telephony.Sms.PERSON)) > 0
+            val isAContact = getInt(getColumnIndexOrThrow(Telephony.Sms.PERSON)) > 0
             sendPhoneSms(date / 1000.0,
-                    getString(getColumnIndex(Telephony.Sms.ADDRESS)),
-                    getInt(getColumnIndex(Telephony.Sms.TYPE)),
-                    getString(getColumnIndex(Telephony.Sms.BODY)),
+                    getString(getColumnIndexOrThrow(Telephony.Sms.ADDRESS)),
+                    getInt(getColumnIndexOrThrow(Telephony.Sms.TYPE)),
+                    getString(getColumnIndexOrThrow(Telephony.Sms.BODY)),
                     isAContact)
 
             date
@@ -117,15 +117,15 @@ class PhoneLogManager(context: PhoneLogService) : AbstractSourceManager<PhoneLog
 
     private fun processCallLog() {
         val newLastCallTimestamp = processDb(CallLog.Calls.CONTENT_URI, CALL_COLUMNS, CallLog.Calls.DATE, lastCallTimestamp) {
-            val date = getLong(getColumnIndex(CallLog.Calls.DATE))
+            val date = getLong(getColumnIndexOrThrow(CallLog.Calls.DATE))
 
             // If contact, then the contact lookup uri is given
-            val targetIsAContact = getString(getColumnIndex(CallLog.Calls.CACHED_LOOKUP_URI)) != null
+            val targetIsAContact = getString(getColumnIndexOrThrow(CallLog.Calls.CACHED_LOOKUP_URI)) != null
 
             sendPhoneCall(date / 1000.0,
-                    getString(getColumnIndex(CallLog.Calls.NUMBER)),
-                    getFloat(getColumnIndex(CallLog.Calls.DURATION)),
-                    getInt(getColumnIndex(CallLog.Calls.TYPE)),
+                    getString(getColumnIndexOrThrow(CallLog.Calls.NUMBER)),
+                    getFloat(getColumnIndexOrThrow(CallLog.Calls.DURATION)),
+                    getInt(getColumnIndexOrThrow(CallLog.Calls.TYPE)),
                     targetIsAContact
             )
 

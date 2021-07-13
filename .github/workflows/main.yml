@@ -1,0 +1,52 @@
+# Continuous integration, including test and integration test
+name: CI
+
+# Run in master and dev branches and in all pull requests to those branches
+on:
+  push:
+    branches: [ master, dev ]
+  pull_request:
+    branches: [ master, dev ]
+
+env:
+  DOCKER_IMAGE: radarbase/radar-output-restructure
+
+jobs:
+  # Build and test the code
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Gradle cache
+        uses: actions/cache@v2
+        with:
+          # Cache gradle directories
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          # An explicit key for restoring and saving the cache
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts', 'gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Decrypt libraries
+        run: ./.github/scripts/decrypt_libraries.sh
+        env:
+          E4LINK_PASSPHRASE: ${{ secrets.E4LINK_PASSPHRASE }}
+
+      # Compile the code
+      - name: Compile code
+        run: ./gradlew assembleDebug
+
+      # Gradle check
+      - name: Check
+        run: ./gradlew testDebugUnitTest lintDebug

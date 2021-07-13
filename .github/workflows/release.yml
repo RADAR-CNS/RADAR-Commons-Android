@@ -1,0 +1,61 @@
+# Create release files
+name: Release
+
+on:
+  release:
+    types: [published]
+
+env:
+  DOCKER_IMAGE: radarbase/radar-output-restructure
+
+jobs:
+  upload:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Gradle cache
+        uses: actions/cache@v2
+        with:
+          # Cache gradle directories
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          # An explicit key for restoring and saving the cache
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts', 'gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Decrypt libraries
+        run: ./.github/scripts/decrypt_libraries.sh
+        env:
+          E4LINK_PASSPHRASE: ${{ secrets.E4LINK_PASSPHRASE }}
+
+      # Compile code
+      - name: Compile code
+        run: ./gradlew assembleRelease
+
+      # Upload it to GitHub
+      - name: Upload to GitHub
+        uses: AButler/upload-release-assets@v2.0
+        with:
+          files: '*/build/outputs/aar/*;plugins/*/build/outputs/aar/*'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install gpg secret key
+        run: |
+          cat <(echo -e "${{ secrets.OSSRH_GPG_SECRET_KEY }}") | gpg --batch --import
+          gpg --list-secret-keys --keyid-format LONG
+
+      - name: Publish
+        env:
+          OSSRH_USER: ${{ secrets.OSSRH_USER }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+        run: ./gradlew -Psigning.gnupg.keyName=${{ secrets.OSSRH_GPG_SECRET_KEY_NAME }} -Psigning.gnupg.executable=gpg -Psigning.gnupg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} publish closeAndReleaseSonatypeStagingRepository
